@@ -4,7 +4,7 @@ workspace(name = "rl_algorithm")
 load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
-load("//bazel-scripts:rl_algorithm_rules.bzl", "rl_algorithm_rules")
+load("//bazel_scripts:rl_algorithm_rules.bzl", "rl_algorithm_rules")
 rl_algorithm_rules()
 
 
@@ -50,17 +50,9 @@ protobuf_deps()
 
 # maven
 
-load("//bazel-scripts:rl_algorithm_java_deps.bzl", "rl_algorithm_java_deps")
+load("//bazel_scripts:rl_algorithm_java_deps.bzl", "rl_algorithm_java_deps")
 rl_algorithm_java_deps()
 
 
-load("//bazel-scripts:rl_envs_rules.bzl", "rl_envs_rules")
+load("//bazel_scripts:rl_envs_rules.bzl", "rl_envs_rules")
 rl_envs_rules()
-
-pip_parse(
-    name = "python_rl_envs_deps",
-    requirements_lock = "@rl_envs_rules//third_party:requirements.txt",
-)
-
-load("@python_rl_envs_deps//:requirements.bzl", "install_deps")
-install_deps()
