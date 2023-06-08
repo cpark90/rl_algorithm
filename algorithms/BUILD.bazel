@@ -6,29 +6,27 @@ load("@python_deps//:requirements.bzl", "requirement")
 
 
 filegroup(
-    name = "random_walk_src",
-    srcs = glob(["random_walk/**/*.py"])
+    name = "model_free_src",
+    srcs = glob(["model_free/**/*.py"])
 )
 
 py_library(
-    name = "random_walk",
+    name = "model_free",
     srcs = [
-        ":random_walk_src",
+        ":model_free_src",
     ],
     deps = [
-        requirement("gymnasium"),
         requirement("numpy"),
     ],
 )
 
 
 py_library(
-    name = "envs",
+    name = "algorithms",
     srcs = [
         "__init__.py",
     ],
     deps = [
-        requirement("gymnasium"),
-        ":random_walk",
+        ":model_free",
     ],
 )

@@ -1,1 +1,1 @@
-from .monte_carlo_model_free_method import *
+from .model_free import *

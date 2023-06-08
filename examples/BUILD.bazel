@@ -14,5 +14,6 @@ py_binary(
         requirement("numpy"),
         requirement("six"),
         "@rl_envs//envs",
+        "//algorithms",
     ],
 )
