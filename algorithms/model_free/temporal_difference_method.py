@@ -1,43 +1,54 @@
 import sys
 import numpy as np
+from copy import copy
 from collections import defaultdict
 
 class TemporalDifferenceMethod:
-    def __init__(self, number_of_state_and_action, gamma=1.0):
-        self.number_of_state_and_action = number_of_state_and_action
-        self.counter = defaultdict(lambda: np.zeros(number_of_state_and_action))
-        self.sum_of_returns = defaultdict(lambda: np.zeros(number_of_state_and_action))
-        self.value_estimation = defaultdict(lambda: np.zeros(number_of_state_and_action))
+    def __init__(self, number_of_action, n_step=1, lambda_=0.0, gamma=1.0, alpha=0.0):
+        self.number_of_action = number_of_action
+        self.value_estimation = self._value_function_initialize(number_of_action=number_of_action, method="zeros")
+        self.value_estimation_backup = self.value_estimation
+        self.n_step = n_step
+        self.lambda_ = lambda_
         self.gamma = gamma
+        self.alpha = alpha
+    
+    def _value_function_initialize(self, number_of_action, method="zeros"):
+        initialized_value_function = None
+        if method == "zeros":
+            initialized_value_function = defaultdict(lambda: np.zeros(number_of_action))
+        elif method == "ones":
+            initialized_value_function = defaultdict(lambda: np.ones(number_of_action))
+        return initialized_value_function
 
-    def every_visit_prediction(self, episode):
-        # obtain the states, actions, and rewards
+    def offline(self, episode):
+        # update backup
+        self.value_estimation_backup = copy(self.value_estimation)
+
         states, actions, rewards = zip(*episode)
         # prepare for discounting
-        discounts = np.array([self.gamma**i for i in range(len(rewards)+1)])
-        # update the sum of the returns, number of visits, and action-value 
-        # function estimates for each state-action pair in the episode
+
         for i, state in enumerate(states):
-            self.sum_of_returns[state][actions[i]] += sum(rewards[i:]*discounts[:-(1+i)])
-            self.counter[state][actions[i]] += 1.0
-            self.value_estimation[state][actions[i]] = self.sum_of_returns[state][actions[i]] / self.counter[state][actions[i]]
-    
-    def first_visit_prediction(self, episode):
-        # obtain the states, actions, and rewards
-        states, actions, rewards = zip(*episode)
-        # prepare for discounting
-        discounts = np.array([self.gamma**i for i in range(len(rewards)+1)])
-        # update the sum of the returns, number of visits, and action-value 
-        # function estimates for each state-action pair in the episode
-        updated = defaultdict(lambda: np.zeros(self.number_of_state_and_action))
-        for i, state in enumerate(states):
-            if updated[state][actions[i]] == 1:
-                continue
+            final_step = i + self.n_step
+            if final_step > len(states) - 1:
+                next_state_and_action = None
             else:
-                updated[state][actions[i]] = 1
-            self.sum_of_returns[state][actions[i]] += sum(rewards[i:]*discounts[:-(1+i)])
-            self.counter[state][actions[i]] += 1.0
-            self.value_estimation[state][actions[i]] = self.sum_of_returns[state][actions[i]] / self.counter[state][actions[i]]
-    
+                next_state_and_action = {"state":states[final_step], "action":actions[final_step]}
+            self.online_update(state=state, action=actions[i], rewards=rewards[i:i+self.n_step], next_state_and_action=next_state_and_action)
+
+    def online_update(self, state, action, rewards, next_state_and_action):
+        discounts = np.array([self.gamma**i for i in range(len(rewards)+1)])
+        
+        # calculate target
+        target = sum(rewards[:] * discounts[:-1])
+        if next_state_and_action is not None:
+            target += self.value_estimation[next_state_and_action["state"]][next_state_and_action["action"]] * discounts[-1]
+        
+        # calculate error
+        error = target - self.value_estimation_backup[state][action]
+
+        # update value_function
+        self.value_estimation[state][action] = self.value_estimation_backup[state][action] + error * self.alpha
+
     def get_value_function(self):
         return self.value_estimation

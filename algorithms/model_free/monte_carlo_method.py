@@ -1,43 +1,95 @@
 import sys
 import numpy as np
+
+from copy import copy
 from collections import defaultdict
 
 class MonteCarloMethod:
-    def __init__(self, number_of_state_and_action, gamma=1.0):
-        self.number_of_state_and_action = number_of_state_and_action
-        self.counter = defaultdict(lambda: np.zeros(number_of_state_and_action))
-        self.sum_of_returns = defaultdict(lambda: np.zeros(number_of_state_and_action))
-        self.value_estimation = defaultdict(lambda: np.zeros(number_of_state_and_action))
+    def __init__(self, number_of_action, first_visit=False, online=False, gamma=1.0, alpha=0):
+        self.number_of_action = number_of_action
+        self.counter = defaultdict(lambda: np.zeros(number_of_action))
+        self.sum_of_returns = defaultdict(lambda: np.zeros(number_of_action))
+        self.value_estimation = self._value_function_initialize(number_of_action=number_of_action, method="zeros")
+        self.value_estimation_backup = None
+        self.first_visit = first_visit
+        self.online = online
         self.gamma = gamma
+        self.alpha = alpha
 
-    def every_visit_prediction(self, episode):
-        # obtain the states, actions, and rewards
-        states, actions, rewards = zip(*episode)
-        # prepare for discounting
-        discounts = np.array([self.gamma**i for i in range(len(rewards)+1)])
-        # update the sum of the returns, number of visits, and action-value 
-        # function estimates for each state-action pair in the episode
-        for i, state in enumerate(states):
-            self.sum_of_returns[state][actions[i]] += sum(rewards[i:]*discounts[:-(1+i)])
-            self.counter[state][actions[i]] += 1.0
-            self.value_estimation[state][actions[i]] = self.sum_of_returns[state][actions[i]] / self.counter[state][actions[i]]
+    def _value_function_initialize(self, number_of_action, method="zeros"):
+        initialized_value_function = None
+        if method == "zeros":
+            initialized_value_function = defaultdict(lambda: np.zeros(number_of_action))
+        elif method == "ones":
+            initialized_value_function = defaultdict(lambda: np.ones(number_of_action))
+        return initialized_value_function
     
-    def first_visit_prediction(self, episode):
-        # obtain the states, actions, and rewards
+    def averaging(self, episode):
         states, actions, rewards = zip(*episode)
         # prepare for discounting
         discounts = np.array([self.gamma**i for i in range(len(rewards)+1)])
         # update the sum of the returns, number of visits, and action-value 
         # function estimates for each state-action pair in the episode
-        updated = defaultdict(lambda: np.zeros(self.number_of_state_and_action))
+
+        if self.first_visit:
+            updated = defaultdict(lambda: np.zeros(self.number_of_action))
+
         for i, state in enumerate(states):
-            if updated[state][actions[i]] == 1:
-                continue
+            # check first visit
+            if self.first_visit:
+                if updated[state][actions[i]] == 1:
+                    continue
+                else:
+                    updated[state][actions[i]] = 1
+
+            # increment counter
+            self.counter[state][actions[i]] += 1.0
+            
+            # calculate sum of returns
+            self.sum_of_returns[state][actions[i]] += sum(rewards[i:] * discounts[:-(1+i)])
+
+            # update value_function
+            self.value_estimation[state][actions[i]] = self.sum_of_returns[state][actions[i]] / self.counter[state][actions[i]]
+
+    def incremental(self, episode):
+        # update backup
+        if self.online:
+            self.value_estimation_backup = self.value_estimation
+        else:    
+            self.value_estimation_backup = copy(self.value_estimation)
+
+        states, actions, rewards = zip(*episode)
+        # prepare for discounting
+        discounts = np.array([self.gamma**i for i in range(len(rewards)+1)])
+        # update the sum of the returns, number of visits, and action-value 
+        # function estimates for each state-action pair in the episode
+
+        if self.first_visit:
+            updated = defaultdict(lambda: np.zeros(self.number_of_action))
+
+        for i, state in enumerate(states):
+            # check first visit
+            if self.first_visit:
+                if updated[state][actions[i]] == 1:
+                    continue
+                else:
+                    updated[state][actions[i]] = 1
+
+            # increment counter
+            self.counter[state][actions[i]] += 1.0
+            
+            # calculate target
+            target = sum(rewards[i:] * discounts[:-(1+i)])
+
+            # calculate error
+            error = target - self.value_estimation_backup[state][actions[i]]
+
+            # update value_function
+            if self.alpha == 0:
+                self.value_estimation[state][actions[i]] = self.value_estimation_backup[state][actions[i]] + error / self.counter[state][actions[i]]
             else:
-                updated[state][actions[i]] = 1
-            self.sum_of_returns[state][actions[i]] += sum(rewards[i:]*discounts[:-(1+i)])
-            self.counter[state][actions[i]] += 1.0
-            self.value_estimation[state][actions[i]] = self.sum_of_returns[state][actions[i]] / self.counter[state][actions[i]]
+                self.value_estimation[state][actions[i]] = self.value_estimation_backup[state][actions[i]] + error * self.alpha
+        
     
-    def get_value_function(self):
+    def get_value_function(self, fill):
         return self.value_estimation
