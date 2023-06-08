@@ -5,9 +5,9 @@ load("@python_deps//:requirements.bzl", "requirement")
 
 
 py_binary(
-    name = "random_walk_model_free_example",
+    name = "random_walk_example",
     srcs = [
-        "random_walk_model_free_example.py",
+        "random_walk_example.py",
     ],
     deps = [
         requirement("gymnasium"),

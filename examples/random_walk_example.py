@@ -12,9 +12,11 @@ env = gym.make('random_walk-v0', n_states=n_states, n_actions=1)
 
 num_episodes = 5000
 
-mc_method_average = MonteCarloMethod(number_of_action=env.action_space.n, first_visit=False, online=False, gamma=1.0, alpha=0.0)
-mc_method_0_01 = MonteCarloMethod(number_of_action=env.action_space.n, first_visit=False, online=False, gamma=1.0, alpha=0.01)
-td_method_0_01 = TemporalDifferenceMethod(number_of_action=env.action_space.n, n_step=1, lambda_=0.0, gamma=1.0, alpha=0.01)
+mc_method_average = MonteCarloMethod(number_of_action=env.action_space.n, first_visit=False, online=False, gamma=1.0, alpha=0.0, initialize_method="0_5")
+mc_method_0_01 = MonteCarloMethod(number_of_action=env.action_space.n, first_visit=False, online=False, gamma=1.0, alpha=0.01, initialize_method="0_5")
+mc_method_0_01_f = MonteCarloMethod(number_of_action=env.action_space.n, first_visit=True, online=False, gamma=1.0, alpha=0.01, initialize_method="0_5")
+td_method_0_15 = TemporalDifferenceMethod(number_of_action=env.action_space.n, n_step=1, lambda_=0.0, gamma=1.0, alpha=0.15, initialize_method="0_5")
+td_method_0_05 = TemporalDifferenceMethod(number_of_action=env.action_space.n, n_step=1, lambda_=0.0, gamma=1.0, alpha=0.05, initialize_method="0_5")
 
 
 data_episode = {}
@@ -34,23 +36,33 @@ for i in range(num_episodes):
     mc_method_average.averaging(episode)
     
     mc_method_0_01.incremental(episode)
-    td_method_0_01.offline(episode)
+    mc_method_0_01_f.incremental(episode)
+    td_method_0_15.offline(episode)
+    td_method_0_05.offline(episode)
 
     if i < 100:
         data_alpha = {}
 
-        td_q_0_01 = td_method_0_01.get_value_function()
-        td_y_0_01 = np.squeeze(np.array(tuple(td_q_0_01[key] for key in sorted(td_q_0_01))))
-        data_alpha["td_y_0_01"] = td_y_0_01
-
-        mc_q_0_01 = mc_method_0_01.get_value_function()
+        mc_q_0_01 = mc_method_0_01.get_value_function(n_states=n_states)
         mc_y_0_01 = np.squeeze(np.array(tuple(mc_q_0_01[key] for key in sorted(mc_q_0_01))))
         data_alpha["mc_y_0_01"] = mc_y_0_01
+
+        mc_q_0_01_f = mc_method_0_01_f.get_value_function(n_states=n_states)
+        mc_y_0_01_f = np.squeeze(np.array(tuple(mc_q_0_01_f[key] for key in sorted(mc_q_0_01_f))))
+        data_alpha["mc_y_0_01_f"] = mc_y_0_01_f
+
+        td_q_0_15 = td_method_0_15.get_value_function(n_states=n_states)
+        td_y_0_15 = np.squeeze(np.array(tuple(td_q_0_15[key] for key in sorted(td_q_0_15))))
+        data_alpha["td_y_0_15"] = td_y_0_15
+
+        td_q_0_05 = td_method_0_05.get_value_function(n_states=n_states)
+        td_y_0_05 = np.squeeze(np.array(tuple(td_q_0_05[key] for key in sorted(td_q_0_05))))
+        data_alpha["td_y_0_05"] = td_y_0_05
 
         data_episode[i] = data_alpha
 
 # make graph
-mc_q_average = mc_method_average.get_value_function()
+mc_q_average = mc_method_average.get_value_function(n_states=n_states)
 mc_y_average = np.squeeze(np.array(tuple(mc_q_average[key] for key in sorted(mc_q_average))))
 
 
@@ -66,6 +78,6 @@ for key in data_episode.keys():
 
 data_graph = []
 for alpha in data.keys():
-    data_graph.append(go.Scatter(x=x, y=data[alpha], name='mc_method-{}-iteration'.format(alpha)))
+    data_graph.append(go.Scatter(x=x, y=data[alpha], name='{}'.format(alpha)))
 
-py.plot(data)
+py.plot(data_graph)
