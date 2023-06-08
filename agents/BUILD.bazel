@@ -6,27 +6,26 @@ load("@python_deps//:requirements.bzl", "requirement")
 
 
 filegroup(
-    name = "model_free_src",
-    srcs = glob(["model_free/**/*.py"])
+    name = "base_src",
+    srcs = glob(["base/**/*.py"])
 )
 
 py_library(
-    name = "model_free",
+    name = "base",
     srcs = [
-        ":model_free_src",
+        ":base_src",
     ],
     deps = [
-        requirement("numpy"),
     ],
 )
 
 
 py_library(
-    name = "algorithms",
+    name = "agents",
     srcs = [
         "__init__.py",
     ],
     deps = [
-        ":model_free",
+        ":base",
     ],
 )

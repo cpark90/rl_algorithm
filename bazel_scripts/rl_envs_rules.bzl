@@ -9,5 +9,5 @@ def rl_envs_rules():
         git_repository(
             name = "rl_envs",
             remote = "https://github.com/cpark90/rl_envs",
-            tag = "v0.03",
+            tag = "v0.04",
         )
