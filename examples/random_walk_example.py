@@ -1,7 +1,7 @@
 import gymnasium as gym
 import numpy as np
 import envs
-from algorithms import MonteCarloMethod, TemporalDifferenceMethod
+from rl_algorithm.algorithms import MonteCarloMethod, TemporalDifferenceMethod
 from collections import OrderedDict
 
 import plotly.graph_objs as go

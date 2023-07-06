@@ -1,0 +1,31 @@
+syntax = "proto3";
+package common;
+
+enum ResultType {
+    SUCCESS = 0;
+    FAIL = 1;
+}
+
+message ValueFuncion {
+    string data = 1;
+}
+
+message ValueFuncionUpdate {
+    string data = 1;
+}
+
+message Policy {
+    string data = 1;
+}
+
+message PolicyUpdate {
+    string data = 1;
+}
+
+message Observation {
+    string data = 1;
+}
+
+message Action {
+    string data = 1;
+}

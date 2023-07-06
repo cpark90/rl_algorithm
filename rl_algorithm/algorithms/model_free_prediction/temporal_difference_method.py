@@ -36,9 +36,9 @@ class TemporalDifferenceMethod:
                 next_state_and_action = None
             else:
                 next_state_and_action = {"state":states[final_step], "action":actions[final_step]}
-            self.online_update(state=state, action=actions[i], rewards=rewards[i:i+self.n_step], next_state_and_action=next_state_and_action)
+            self.online(state=state, action=actions[i], rewards=rewards[i:i+self.n_step], next_state_and_action=next_state_and_action)
 
-    def online_update(self, state, action, rewards, next_state_and_action):
+    def online(self, state, action, rewards, next_state_and_action):
         discounts = np.array([self.gamma**i for i in range(len(rewards)+1)])
         
         # calculate target

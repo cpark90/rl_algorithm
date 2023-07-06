@@ -1,0 +1,49 @@
+package(default_visibility = ["//visibility:public"])
+
+load("@rules_python//python:defs.bzl", "py_library", "py_binary")
+load("@python_deps//:requirements.bzl", "requirement")
+
+
+filegroup(
+    name = "model_free_prediction_src",
+    srcs = glob(["model_free_prediction/**/*.py"])
+)
+
+py_library(
+    name = "model_free_prediction_lib",
+    srcs = [
+        ":model_free_prediction_src",
+    ],
+    deps = [
+        requirement("numpy"),
+    ],
+)
+
+py_library(
+    name = "algorithm_worker_lib",
+    srcs = ["algorithm_worker.py"],
+    deps = [
+        requirement("celery"),
+        ":model_free_prediction_lib",
+    ],
+)
+
+py_library(
+    name = "algorithms",
+    srcs = [
+        "__init__.py",
+    ],
+    deps = [
+        ":model_free_prediction_lib",
+        ":algorithm_worker_lib"
+    ],
+)
+
+
+py_binary(
+    name = "algorithm_worker",
+    srcs = ["algorithm_worker.py"],
+    deps = [
+        requirement("celery"),
+    ],
+)

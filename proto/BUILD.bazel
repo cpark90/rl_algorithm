@@ -1,0 +1,43 @@
+package(default_visibility = ["//visibility:public"])
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_grpc_library", "py_proto_library")
+
+
+proto_library(
+    name = "rl_algorithm_prototype_message_proto",
+    srcs = ["rl_algorithm_prototype_message.proto"],
+)
+
+proto_library(
+    name = "rl_algorithm_prototype_proto",
+    srcs = [
+        "rl_algorithm_prototype.proto",
+    ],
+    deps = [
+        ":rl_algorithm_prototype_message_proto",
+    ],
+)
+
+py_proto_library(
+    name = "rl_algorithm_prototype_message_pb2",
+    deps = [
+        ":rl_algorithm_prototype_message_proto",
+    ]
+)
+
+py_proto_library(
+    name = "rl_algorithm_prototype_pb2",
+    deps = [
+        ":rl_algorithm_prototype_proto",
+    ]
+)
+
+py_grpc_library(
+    name = "rl_algorithm_prototype_pb2_grpc",
+    srcs = [
+        ":rl_algorithm_prototype_proto"
+    ],
+    deps = [
+        ":rl_algorithm_prototype_pb2",
+    ]
+)

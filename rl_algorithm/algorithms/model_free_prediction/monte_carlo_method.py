@@ -92,7 +92,6 @@ class MonteCarloMethod:
             else:
                 self.value_estimation[state][actions[i]] = self.value_estimation_backup[state][actions[i]] + error * self.alpha
         
-    
     def get_value_function(self, n_states=None):
         if n_states is not None:
             for i_s in range(n_states):

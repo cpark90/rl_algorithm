@@ -2,6 +2,7 @@ package(default_visibility = ["//visibility:public"])
 
 load("@rules_python//python:defs.bzl", "py_binary")
 load("@python_deps//:requirements.bzl", "requirement")
+load("@io_bazel_rules_docker//lang:image.bzl", container_image = "app_layer")
 
 
 py_binary(
@@ -14,6 +15,25 @@ py_binary(
         requirement("numpy"),
         requirement("six"),
         "@rl_envs//envs",
-        "//algorithms",
+        "//rl_algorithm/algorithms",
     ],
+)
+
+py_binary(
+    name = "grpc_example",
+    srcs = [
+        "grpc_example.py",
+    ],
+    deps = [
+        requirement("numpy"),
+        "//rl_algorithm",
+        "//proto:rl_algorithm_prototype_pb2_grpc"
+    ],
+)
+
+container_image(
+    name = "grpc_example_image",
+    base = "@python-base-image//image",
+    binary = ":grpc_example",
+    docker_run_flags = "-it --rm --network=host --runtime=nvidia",
 )

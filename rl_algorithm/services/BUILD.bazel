@@ -1,32 +1,27 @@
 package(default_visibility = ["//visibility:public"])
-
 load("@rules_python//python:defs.bzl", "py_library")
 load("@python_deps//:requirements.bzl", "requirement")
 
 
-
-filegroup(
-    name = "model_free_src",
-    srcs = glob(["model_free/**/*.py"])
-)
-
 py_library(
-    name = "model_free",
+    name = "prototype_service",
     srcs = [
-        ":model_free_src",
+        "prototype_service.py",
     ],
     deps = [
-        requirement("numpy"),
+        requirement("grpcio"),
+        "//proto:scenario_control_pb2_grpc",
+        "//proto:scenario_control_message_pb2",
     ],
 )
 
 
 py_library(
-    name = "algorithms",
+    name = "services",
     srcs = [
         "__init__.py",
     ],
     deps = [
-        ":model_free",
+        ":prototype_service",
     ],
 )

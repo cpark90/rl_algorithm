@@ -12,7 +12,9 @@ class AgentBase:
         self.model_class = model_class
         self.value_function_class = value_function_class
     
-    def set_initial_state(self, state_feature):
+    def start_new_episode(self, state_feature):
+        if self.current_episode:
+            self.append_episode()
         self.current_state = self.state_estimation(state_feature)
 
     def observe(self, observation):
@@ -33,9 +35,9 @@ class AgentBase:
     def append_episode(self):
         self.episodes.append(self.current_episode)
         self.current_episode = []
-    
+
     def update_value_function(self):
         raise NotImplementedError
-    
+
     def update_model(self):
         raise NotImplementedError

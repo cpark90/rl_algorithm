@@ -1,0 +1,11 @@
+syntax = "proto3";
+import "proto/rl_algorithm_prototype_message.proto";
+
+service RLAlgorithm {
+  rpc Init(rl_algorithm_prototype.InitRequest) returns (rl_algorithm_prototype.InitResponse);
+  rpc Act(rl_algorithm_prototype.ActRequest) returns (rl_algorithm_prototype.ActResponse);
+  rpc ValueFuncUpdate(rl_algorithm_prototype.ValueFuncUpdateRequest) returns (rl_algorithm_prototype.ValueFuncUpdateResponse);
+  rpc PolicyUpdate(rl_algorithm_prototype.PolicyUpdateRequest) returns (rl_algorithm_prototype.PolicyUpdateResponse);
+  rpc GetValueFunc(rl_algorithm_prototype.GetValueFuncRequest) returns (rl_algorithm_prototype.GetValueFuncResponse);
+  rpc GetPolicy(rl_algorithm_prototype.GetPolicyRequest) returns (rl_algorithm_prototype.GetPolicyResponse);
+}

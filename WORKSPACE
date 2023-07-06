@@ -8,6 +8,17 @@ load("//bazel_scripts:rl_algorithm_rules.bzl", "rl_algorithm_rules")
 rl_algorithm_rules()
 
 
+# GRPC
+load("@com_github_grpc_grpc//bazel:grpc_deps.bzl", "grpc_deps")
+grpc_deps()
+
+load("@com_github_grpc_grpc//bazel:grpc_extra_deps.bzl", "grpc_extra_deps")
+grpc_extra_deps()
+
+load("@com_github_grpc_grpc//bazel:grpc_python_deps.bzl", "grpc_python_deps")
+grpc_python_deps()
+
+
 # python
 load("@rules_python//python:repositories.bzl", "py_repositories")
 py_repositories()
@@ -37,22 +48,36 @@ load(
 _py_image_repos()
 
 
-# protocol buffer
+# Below are listed only deps needed by examples: if you just need ROS2 you don't
+# need to import/load anything below.
 
-load("@rules_proto//proto:repositories.bzl", "rules_proto_dependencies")
+# rules_docker is not strictly necessary, but interesting if you want to create
+# and/or push docker containers for the examples. The docker executable is
+# needed only if you want to run an image using Bazel.
 
-rules_proto_dependencies()
+load(
+    "@io_bazel_rules_docker//repositories:repositories.bzl",
+    container_repositories = "repositories",
+)
 
-load("@com_google_protobuf//:protobuf_deps.bzl", "protobuf_deps")
+container_repositories()
 
-protobuf_deps()
+load("@io_bazel_rules_docker//repositories:deps.bzl", container_deps = "deps")
 
+container_deps()
 
-# maven
+load(
+    "@io_bazel_rules_docker//container:container.bzl",
+    "container_pull",
+)
 
-load("//bazel_scripts:rl_algorithm_java_deps.bzl", "rl_algorithm_java_deps")
-rl_algorithm_java_deps()
-
+# python container python:3.8.16 base
+container_pull(
+    name = "python-base-image",
+    registry = "docker.io",
+    repository = "python",
+    tag = "3.8.16",
+)
 
 load("//bazel_scripts:rl_envs_rules.bzl", "rl_envs_rules")
 rl_envs_rules()
