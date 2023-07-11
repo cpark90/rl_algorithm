@@ -1,3 +1,5 @@
+import abc
+
 class AgentBase:
     def __init__(self, state_estimation, reward_estimation, policy_class, model_class, value_function_class):
         self.episodes = []
@@ -36,8 +38,10 @@ class AgentBase:
         self.episodes.append(self.current_episode)
         self.current_episode = []
 
+    @abc.abstractmethod
     def update_value_function(self):
-        raise NotImplementedError
+        pass
 
+    @abc.abstractmethod
     def update_model(self):
-        raise NotImplementedError
+        pass

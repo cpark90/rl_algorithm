@@ -20,9 +20,9 @@ py_binary(
 )
 
 py_binary(
-    name = "grpc_example",
+    name = "prototype_server",
     srcs = [
-        "grpc_example.py",
+        "prototype_server.py",
     ],
     deps = [
         requirement("numpy"),
@@ -32,8 +32,8 @@ py_binary(
 )
 
 container_image(
-    name = "grpc_example_image",
+    name = "prototype_server_image",
     base = "@python-base-image//image",
-    binary = ":grpc_example",
+    binary = ":prototype_server",
     docker_run_flags = "-it --rm --network=host --runtime=nvidia",
 )

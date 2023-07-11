@@ -6,11 +6,11 @@ enum ResultType {
     FAIL = 1;
 }
 
-message ValueFuncion {
+message ValueFunction {
     string data = 1;
 }
 
-message ValueFuncionUpdate {
+message ValueFuncUpdate {
     string data = 1;
 }
 

@@ -10,8 +10,11 @@ py_library(
     ],
     deps = [
         requirement("grpcio"),
-        "//proto:scenario_control_pb2_grpc",
-        "//proto:scenario_control_message_pb2",
+        "//proto:rl_algorithm_prototype_pb2_grpc",
+        "//proto:data_types_pb2",
+        "//proto:rl_algorithm_prototype_message_pb2",
+
+        "//rl_algorithm/algorithms",
     ],
 )
 

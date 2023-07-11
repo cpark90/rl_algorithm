@@ -1,0 +1,28 @@
+package(default_visibility = ["//visibility:public"])
+
+load("@rules_python//python:defs.bzl", "py_binary")
+load("@python_deps//:requirements.bzl", "requirement")
+load("@io_bazel_rules_docker//lang:image.bzl", container_image = "app_layer")
+
+
+# client example
+py_binary(
+    name = "prototype_client",
+    srcs = [
+        "prototype_client.py",
+    ],
+    deps = [
+        requirement("grpcio"),
+        "//proto:data_types_pb2",
+        "//proto:rl_algorithm_prototype_message_pb2",
+        "//proto:rl_algorithm_prototype_pb2_grpc",
+    ],
+)
+
+container_image(
+    name = "prototype_client_image",
+    base = "@python-base-image//image",
+    binary = ":prototype_client",
+    docker_run_flags = "-it --rm --network=host",
+)
+

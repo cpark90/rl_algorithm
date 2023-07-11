@@ -21,5 +21,8 @@ py_library(
     ],
     deps = [
         ":grpc_server",
+        "//rl_algorithm/agents",
+        "//rl_algorithm/algorithms",
+        "//rl_algorithm/services",
     ],
 )

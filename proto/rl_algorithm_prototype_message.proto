@@ -1,6 +1,7 @@
 syntax = "proto3";
 package rl_algorithm_prototype;
-import "proto/types.proto";
+
+import "proto/data_types.proto";
 
 message InitRequest {
   uint32 id = 1;
@@ -8,31 +9,31 @@ message InitRequest {
 }
 
 message InitResponse {
-  ResultType result = 1;
+  common.ResultType result = 1;
 }
 
 message ActRequest {
-  Observation observation = 1;
+  common.Observation observation = 1;
 }
 
 message ActResponse {
-  Action action = 1;
+  common.Action action = 1;
 }
 
 message ValueFuncUpdateRequest {
-  ValueFuncUpdate value_func_update = 1;
+  common.ValueFuncUpdate value_func_update = 1;
 }
 
 message ValueFuncUpdateResponse {
-  ResultType result = 1;
+  common.ResultType result = 1;
 }
 
 message PolicyUpdateRequest {
-  PolicyUpdate policy_update = 1;
+  common.PolicyUpdate policy_update = 1;
 }
 
 message PolicyUpdateResponse {
-  ResultType result = 1;
+  common.ResultType result = 1;
 }
 
 message GetValueFuncRequest {
@@ -40,7 +41,7 @@ message GetValueFuncRequest {
 }
 
 message GetValueFuncResponse {
-  ValueFuncion value_function = 1;
+  common.ValueFunction value_function = 1;
 }
 
 message GetPolicyRequest {
@@ -48,5 +49,5 @@ message GetPolicyRequest {
 }
 
 message GetPolicyResponse {
-  Policy policy = 1;
+  common.Policy policy = 1;
 }

@@ -4,8 +4,20 @@ load("@com_github_grpc_grpc//bazel:python_rules.bzl", "py_grpc_library", "py_pro
 
 
 proto_library(
+    name = "data_types_proto",
+    srcs = [
+        "data_types.proto"
+    ],
+)
+
+proto_library(
     name = "rl_algorithm_prototype_message_proto",
-    srcs = ["rl_algorithm_prototype_message.proto"],
+    srcs = [
+        "rl_algorithm_prototype_message.proto"
+    ],
+    deps = [
+        ":data_types_proto",
+    ]
 )
 
 proto_library(
@@ -16,6 +28,13 @@ proto_library(
     deps = [
         ":rl_algorithm_prototype_message_proto",
     ],
+)
+
+py_proto_library(
+    name = "data_types_pb2",
+    deps = [
+        ":data_types_proto",
+    ]
 )
 
 py_proto_library(

@@ -1,7 +1,5 @@
 from concurrent import futures
-
 import grpc
-
 
 class GrpcServer(object):
 
@@ -11,5 +9,6 @@ class GrpcServer(object):
         self.server.add_insecure_port(addr)
     
     def serve(self):
+        print("run server")
         self.server.start()
         self.server.wait_for_termination()

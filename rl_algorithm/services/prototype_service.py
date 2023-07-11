@@ -1,7 +1,6 @@
 import proto.rl_algorithm_prototype_pb2_grpc as rl_algorithm_prototype
 import proto.rl_algorithm_prototype_message_pb2 as rl_algorithm_prototype_message
 import proto.data_types_pb2 as data_types
-from rl_algorithm.algorithms import PrototypeAlgorithm
 
 class PrototypeServicer(rl_algorithm_prototype.RLAlgorithmServicer):
     def Init(self, request, context):
@@ -30,7 +29,8 @@ class PrototypeServicer(rl_algorithm_prototype.RLAlgorithmServicer):
 
     def GetValueFunc(self, request, context):
         metadata = dict(context.invocation_metadata())
-
+        print(request.data)
+        
         value_function = data_types.ValueFunction()
         return rl_algorithm_prototype_message.GetValueFuncResponse(value_function=value_function)
 

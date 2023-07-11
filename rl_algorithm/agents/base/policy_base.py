@@ -1,12 +1,15 @@
-class PolicyMeta(type):
+import abc
+
+class PolicySingleton:
+    _instance = None
     _model_class = None
     _value_function_class = None
     _policies = {}
 
-    def __init__(cls, policy, model_class, value_function_class):
-        cls.set_policy(policy)
-        cls._model_class = model
-        cls._value_function_class = value_function_class
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super().__new__(cls, *args, **kwargs)
+        return cls._instance
     
     def set_policy(cls, policy, key="default"):
         cls._policies[key] = policy
@@ -20,6 +23,12 @@ class PolicyMeta(type):
     def get_value_function_class(cls):
         return cls._value_function_class
 
-class PolicyBase(metaclass=PolicyMeta):
+class PolicyBase(PolicySingleton):
+    def __init__(cls, policy, model_class, value_function_class):
+        cls.set_policy(policy)
+        cls._model_class = model_class
+        cls._value_function_class = value_function_class
+
+    @abc.abstractmethod
     def act(self, current_state):
-        raise NotImplementedError
+        pass
