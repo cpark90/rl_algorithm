@@ -1,6 +1,19 @@
-import abc
+from abc import ABCMeta, abstractmethod
 
-class ModelSingleton:
+class ModelBase(metaclass=ABCMeta):
+    @abstractmethod
+    def set_model(self, model, key):
+        pass
+
+    @abstractmethod
+    def get_model(self, key):
+        pass
+
+    @abstractmethod
+    def transition(self, state, action):
+        pass
+
+class ModelSingleton(ModelBase):
     _instance = None
     _models = {}
 
@@ -15,11 +28,21 @@ class ModelSingleton:
     def get_model(cls, key="default"):
         return cls._models[key]
 
+class ModelRedis(ModelBase):
+    def __init__(cls, redis_module):
+        cls.r = redis_module
+    
+    def set_model(cls, model, key="default"):
+        r.set(key, model)
+    
+    def get_model(cls, key="default"):
+        return cls.r.get(key)
+    
+    def close(cls):
+        cls.r.close()
 
-class ModelBase(ModelSingleton):
-    def __init__(cls, model):
-        cls.set_model(model)
-
-    @abc.abstractmethod
-    def transition(self, state, action):
-        pass
+if __name__ == "__main__":
+    a = ModelSingleton()
+    b = ModelSingleton()
+    a.set_model("hello")
+    print(b.get_model())
